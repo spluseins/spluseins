@@ -52,13 +52,18 @@ export default {
   },
   data () {
     const availableSources = [
-      { description: 'Campus Wolfenbüttel', title: 'aus Wolfenbüttel', path: 'wf' },
-      { description: 'Campus Wolfsburg', title: 'aus Wolfsburg', path: 'wob' },
-      { description: 'Campus Suderburg', title: 'aus Suderburg', path: 'sud' },
       { description: 'Fakultät Elektrotechnik', title: 'aus der E-Technik', path: 'e' },
       { description: 'Fakultät Recht', title: 'aus dem Recht', path: 'r' },
-      { description: 'Fakultät Soziale Arbeit', title: 'aus der sozialen Arbeit', path: 's' }];
-
+      { description: 'Fakultät Versorgungstechnik', title: 'aus ', path: 'v' },
+      { description: 'Fakultät Maschinenbau', title: 'aus ', path: 'm' },
+      { description: 'Fakultät Bau-Wasser-Boden', title: 'aus ', path: 'b' },
+      { description: 'Fakultät Verkehr-Sport-Tourismus-Medien', title: 'aus ', path: 'k' },
+      { description: 'Fakultät Handel und Soziale Arbeit', title: 'aus ', path: 'h' },
+      { description: 'Fakultät Fahrzeugtechnik', title: 'aus ', path: 'f' },
+      { description: 'Fakultät Gesundsheitswesen', title: 'aus ', path: 'g' },
+      { description: 'Fakultät Wirtschaft', title: 'aus ', path: 'w' },
+      { description: 'Fakultät Soziale Arbeit', title: 'aus ', path: 's' }
+    ];
     return {
       dialogOpen: false,
       availableSources
