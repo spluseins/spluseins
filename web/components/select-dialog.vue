@@ -5,7 +5,8 @@
   >
     <v-dialog
       v-model="dialogOpen"
-      max-width="400"
+      max-width="450"
+      scrollable
     >
       <v-card>
         <v-toolbar
@@ -25,16 +26,30 @@
         <v-card-text class="card-text-padding">
           <v-list>
             <v-list-tile
-              v-for="item in items"
-              :key="!!item.description? item.description: item.label"
-              @click="selectedItem = item, dialogOpen = false"
+              ripple
+              @click="toggleAll"
+              v-if="this.items.length >= 5"
             >
               <v-list-tile-action>
-                <v-icon
-                  v-if="!!item.description? item.description == selectedItem.description: item.label == selectedItem.label"
-                >
-                  mdi-check
-                </v-icon>
+                <v-icon>{{ selectAllIcon }}</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>Alle auswählen</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-divider v-if="this.items.length >= 5" />
+            <v-list-tile
+              ripple
+              v-for="item in items"
+              :key="!!item.description? item.description: item.label"
+              @click="toggleSelection(item)"
+            >
+              <v-list-tile-action>
+                <v-list-tile-action>
+                  <v-icon v-if="selected.includes(item)">
+                    mdi-check
+                  </v-icon>
+                </v-list-tile-action>
               </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>{{ !!item.description? item.description: item.label }}</v-list-tile-title>
@@ -51,6 +66,11 @@
 
 export default {
   name: 'SelectDialog',
+  data () {
+    return {
+      selected: [...this.parentSelection]
+    }
+  },
   props: {
     open: {
       type: Boolean,
@@ -64,19 +84,46 @@ export default {
       type: Array,
       default: () => []
     },
-    selected: {
-      type: Object,
-      default: () => {}
+    parentSelection: {
+      type: Array,
+      default: () => []
     }
   },
   computed: {
+    hasCheckedAllItems () {
+      return this.selected.length === this.items.length
+    },
+    hasCheckedSomeItems () {
+      return this.selected.length > 0 && !this.hasCheckedAllItems
+    },
+    selectAllIcon () {
+      if (this.hasCheckedAllItems) return 'mdi-check'
+      if (this.hasCheckedSomeItems) return 'mdi-minus'
+      return ''
+    },
     dialogOpen: {
       get () { return this.open; },
       set (value) { this.$emit('update:open', value); }
+    }
+  },
+  methods: {
+    toggleAll () {
+      this.$nextTick(() => {
+        if (this.hasCheckedAllItems) {
+          this.selected = []
+        } else {
+          this.selected = this.items.slice()
+        }
+        this.$emit('update:parentSelection', this.selected);
+      })
     },
-    selectedItem: {
-      get () { return this.selected; },
-      set (value) { this.$emit('update:selected', value); }
+    toggleSelection (item) {
+      if (this.selected.includes(item)) {
+        this.selected = this.selected.filter(el => el !== item)
+      } else {
+        this.selected.push(item)
+      }
+      this.$emit('update:parentSelection', this.selected);
     }
   }
 };

@@ -6,7 +6,7 @@
       </div>
       <v-btn
         icon
-        @click="dialogOpen = true; $track('News', 'openSelectNews')"
+        @click.stop="dialogOpen = true; $track('News', 'openSelectNews')"
       >
         <v-icon>mdi-newspaper</v-icon>
       </v-btn>
@@ -14,19 +14,22 @@
     <v-card-text class="card-text-padding">
       <v-list dense>
         <div
-          v-for="item in facultyNews"
+          v-for="item in news"
           :key="item.link"
           class="list-tile"
         >
-          <a
+          <span :class="['grey--text', {'text--darken-1': !isDark, 'text--lighten-1': isDark }]">
+            {{ shortname(item.source) }}:
+          </span>
+          <span><a
             :href="item.link"
             target="_blank"
             class="link"
           >
             {{ item.title }}
-          </a>
+          </a></span>
           <br>
-          <span>{{ item.text }}</span>
+          {{ item.text }}
           <br>
         </div>
       </v-list>
@@ -34,8 +37,8 @@
 
     <select-dialog
       :open.sync="dialogOpen"
-      :items="availableSources"
-      :selected.sync="selectedItem"
+      :items="availableSoures"
+      :parent-selection.sync="selectedItem"
       title="Quelle auswählen"
     />
   </v-card>
@@ -51,18 +54,18 @@ export default {
     SelectDialog
   },
   data () {
-    const availableSources = [
-      { description: 'Fakultät Elektrotechnik', title: 'aus der E-Technik', path: 'e' },
-      { description: 'Fakultät Recht', title: 'aus dem Recht', path: 'r' },
-      { description: 'Fakultät Versorgungstechnik', title: 'aus ', path: 'v' },
-      { description: 'Fakultät Maschinenbau', title: 'aus ', path: 'm' },
-      { description: 'Fakultät Bau-Wasser-Boden', title: 'aus ', path: 'b' },
-      { description: 'Fakultät Verkehr-Sport-Tourismus-Medien', title: 'aus ', path: 'k' },
-      { description: 'Fakultät Handel und Soziale Arbeit', title: 'aus ', path: 'h' },
-      { description: 'Fakultät Fahrzeugtechnik', title: 'aus ', path: 'f' },
-      { description: 'Fakultät Gesundsheitswesen', title: 'aus ', path: 'g' },
-      { description: 'Fakultät Wirtschaft', title: 'aus ', path: 'w' },
-      { description: 'Fakultät Soziale Arbeit', title: 'aus ', path: 's' }
+    const availableSoures = [
+      { description: 'Fakultät Elektrotechnik', shortname: 'E-Technik', path: 'e' },
+      { description: 'Fakultät Recht', shortname: 'Recht', path: 'r' },
+      { description: 'Fakultät Versorgungstechnik', shortname: 'Versorgung', path: 'v' },
+      { description: 'Fakultät Maschinenbau', shortname: 'MB', path: 'm' },
+      { description: 'Fakultät Bau-Wasser-Boden', shortname: 'BWB', path: 'b' },
+      { description: 'Fakultät Verkehr-Sport-Tourismus-Medien', shortname: 'Salzgitter', path: 'k' },
+      { description: 'Fakultät Handel und Soziale Arbeit', shortname: 'Handel', path: 'h' },
+      { description: 'Fakultät Fahrzeugtechnik', shortname: 'Fahrzeugtechnik', path: 'f' },
+      { description: 'Fakultät Gesundsheitswesen', shortname: 'Gesundheit', path: 'g' },
+      { description: 'Fakultät Wirtschaft', shortname: 'Wirtschaft', path: 'w' },
+      { description: 'Fakultät Soziale Arbeit', shortname: 'Soziales', path: 's' }
     ];
     return {
       dialogOpen: false,
@@ -70,34 +73,32 @@ export default {
     }
   },
   computed: {
+    news () {
+      return this.facultyNews;
+    },
     selectedItem: {
-      get () {
-        let selectedItem = this.availableSources.filter(source => source.path === this.faculty)[0];
-        if (selectedItem == null) {
-          // Reset to default if invalid item is used for some reason. This way we avoid blocking the whole dashboard in edge cases.
-          selectedItem = this.availableSources[0];
-          this.setFaculty(selectedItem.path);
-        }
-        return selectedItem;
-      },
-      set (value) { this.setFaculty(value.path); }
+      get () { return this.availableSoures.filter(source => this.faculties.includes(source.path)); },
+      set (value) { this.setFaculties(value.map(item => item.path)); }
     },
     ...mapState({
       facultyNews: (state) => state.news.facultyNews,
-      faculty: (state) => state.news.faculty,
+      faculties: (state) => state.news.faculties,
       lazyLoad: (state) => state.lazyLoad
     })
   },
   mounted () {
     if (this.lazyLoad) {
       // static build -> no news are in the store
-      this.loadNews();
+      this.loadNews(this.faculties);
     }
   },
   methods: {
+    shortname (path) {
+      return this.availableSoures.filter(source => source.path === path)[0].shortname;
+    },
     ...mapActions({
       loadNews: 'news/loadFacultyNews',
-      setFaculty: 'news/setFaculty'
+      setFaculties: 'news/setFaculties'
     })
   }
 };

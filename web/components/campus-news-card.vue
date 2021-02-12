@@ -37,12 +37,16 @@ import { mapState, mapActions } from 'vuex';
 export default {
   name: 'CampusNewsCard',
   data () {
-    const availableSources = [
-      { description: 'Campus 38', shortname: 'Campus38', path: 'campus38' },
-      { description: 'Ostfalia Campus', shortname: 'Ostfalia', path: 'campus' }
+    const availableSoures = [
+      { description: 'Campus 38', shortname: 'Campus 38', path: 'campus38' },
+      { description: 'Ostfalia Campus', shortname: 'Ostfalia', path: 'campus' },
+      { description: 'Standort Wolfenbüttel', shortname: 'Wolfenbüttel', path: 'wf' },
+      { description: 'Standort Suderburg', shortname: 'Suderburg', path: 'sud' },
+      { description: 'Standort Salzgitter', shortname: 'Salzgitter', path: 'sz' },
+      { description: 'Standort Wolfenbüttel', shortname: 'Wolfenbüttel', path: 'wob' }
     ];
     return {
-      availableSources
+      availableSoures
     }
   },
   computed: {
@@ -60,7 +64,7 @@ export default {
   },
   methods: {
     shortname (path) {
-      return this.availableSources.filter(source => source.path === path)[0].shortname;
+      return this.availableSoures.filter(source => source.path === path)[0].shortname;
     },
     ...mapActions({
       loadCampusNews: 'news/loadCampusNews'
