@@ -8,6 +8,7 @@
       :fullscreen="$vuetify.breakpoint.smAndDown"
       max-width="800px"
       hide-overlay
+      scrollable
       transition="dialog-bottom-transition"
     >
       <v-card>
@@ -37,54 +38,56 @@
             </v-btn>
           </v-toolbar-items>
         </v-toolbar>
-        <v-form v-model="valid">
-          <v-container grid-list-md>
-            <v-layout
-              row
-              wrap
-            >
-              <v-flex xs12>
-                <v-text-field
-                  v-model="selectedName"
-                  :rules="[rules.required, rules.uniqueScheduleLabel, isNew ? rules.uniqueCustomScheduleLabel : true]"
-                  label="Plan benennen"
-                  single-line
-                  required
-                  autofocus
-                />
-              </v-flex>
+        <v-card-text class="card-text-padding">
+          <v-form v-model="valid">
+            <v-container grid-list-md>
+              <v-layout
+                row
+                wrap
+              >
+                <v-flex xs12>
+                  <v-text-field
+                    v-model="selectedName"
+                    :rules="[rules.required, rules.uniqueScheduleLabel, isNew ? rules.uniqueCustomScheduleLabel : true]"
+                    label="Plan benennen"
+                    single-line
+                    required
+                    autofocus
+                  />
+                </v-flex>
 
-              <v-flex xs12>
-                <timetable-select
-                  v-show="selectedSchedules.length <= maxSchedules"
-                  :selected-schedules="selectedSchedules"
-                  :loading="loading"
-                  @input="addSchedule"
-                />
-              </v-flex>
+                <v-flex xs12>
+                  <timetable-select
+                    v-show="selectedSchedules.length <= maxSchedules"
+                    :selected-schedules="selectedSchedules"
+                    :loading="loading"
+                    @input="addSchedule"
+                  />
+                </v-flex>
 
-              <v-flex xs12>
-                <v-chip
-                  v-for="schedule in selectedSchedules"
-                  :key="schedule.id"
-                  close
-                  @input="removeSchedule(schedule)"
-                >
-                  {{ getFormattedName(schedule) }}
-                </v-chip>
-              </v-flex>
+                <v-flex xs12>
+                  <v-chip
+                    v-for="schedule in selectedSchedules"
+                    :key="schedule.id"
+                    close
+                    @input="removeSchedule(schedule)"
+                  >
+                    {{ getFormattedName(schedule) }}
+                  </v-chip>
+                </v-flex>
 
-              <v-flex xs12>
-                <course-multiselect
-                  v-show="selectedSchedules.length > 0"
-                  v-model="selectedCourses"
-                  :max-courses="maxCourses"
-                  :lectures="allLectures"
-                />
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-form>
+                <v-flex xs12>
+                  <course-multiselect
+                    v-show="selectedSchedules.length > 0"
+                    v-model="selectedCourses"
+                    :max-courses="maxCourses"
+                    :lectures="allLectures"
+                  />
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-form>
+        </v-card-text>
       </v-card>
 
       <custom-timetable-cookie-reminder
@@ -264,3 +267,11 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="scss">
+
+.card-text-padding{
+  padding: 0px 5px;
+}
+
+</style>
