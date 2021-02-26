@@ -53,7 +53,7 @@ export default ({ store }) => {
         subscribedTimetable: state.splus.subscribedTimetable
       },
       news: {
-        faculty: state.news.faculty
+        selectors: state.news.newsSelectors
       },
       privacy: {
         allowAllCookies: state.privacy.allowAllCookies,

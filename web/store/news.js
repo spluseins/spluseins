@@ -1,7 +1,7 @@
 export const state = () => ({
-  faculties: ['e'], // todo changeme
-  campusNews: [],
-  facultyNews: []
+  newsSelectors: ['campus'],
+  facultyNews: [],
+  campusNews: []
 });
 
 export const mutations = {
@@ -11,33 +11,34 @@ export const mutations = {
   setFacultyNews (state, data) {
     state.facultyNews = data;
   },
-  setFaculties (state, faculties) {
-    state.faculties = faculties;
+  setCampusSelectors (state, newsSelectors) {
+    state.newsSelectors = newsSelectors;
   }
 }
 
 export const actions = {
-  async loadFacultyNews ({ commit, state }) {
-    if (state.faculties.length === 0) {
+  async loadFacultyNews ({ commit }, faculties) {
+    if (faculties.length === 0) {
       return commit('setFacultyNews', []);
     }
     try {
-      const news = await this.$axios.$get(`/api/news/${state.faculties.join(',')}`, { params: { limit: 7 } });
+      const news = await this.$axios.$get(`/api/news/${faculties.join(',')}`, { params: { limit: 5 } });
       commit('setFacultyNews', news);
     } catch (error) {
       commit('enqueueError', 'News: API-Verbindung fehlgeschlagen (Fakultät-News)', { root: true });
       console.error('error during News API call (Fakultät-News)', error.message);
     }
   },
-  async setFaculties ({ commit, dispatch }, faculties) {
-    commit('setFaculties', faculties);
-    dispatch('loadFacultyNews');
+  async setCampusSelectors ({ commit, dispatch }, newsSelectors) {
+    commit('setCampusSelectors', newsSelectors);
+    dispatch('loadCampusNews');
   },
-  async loadCampusNews ({ commit }) {
-    const newsSelectors = ['wf', 'wob', 'sud', 'sz', 'campus', 'campus38'];
+  async loadCampusNews ({ commit, state }) {
+    if (state.newsSelectors.length === 0) {
+      return commit('setCampusNews', []);
+    }
     try {
-      const campusNews = await this.$axios.$get(`/api/news/${newsSelectors.join(',')}`, { params: { limit: 10 } });
-
+      const campusNews = await this.$axios.$get(`/api/news/${state.newsSelectors.join(',')}`, { params: { limit: 8 } });
       commit('setCampusNews', campusNews);
     } catch (error) {
       commit('enqueueError', 'News: API-Verbindung fehlgeschlagen (Ostfalia-News)', { root: true });
