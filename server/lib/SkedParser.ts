@@ -3,6 +3,7 @@ import * as moment from 'moment-timezone';
 import { ParsedLecture } from '../model/SplusModel';
 import parseTable from './parseTable';
 import * as CSV from 'csv-string';
+import * as sanitize from 'sanitize-html';
 
 moment.locale('de');
 
@@ -11,7 +12,7 @@ export function parseSkedList (html: string): ParsedLecture[] {
 
   const events = [] as ParsedLecture[];
 
-  let lastDatum = '';
+  const lastDatum = '';
   let datum = '';
   let uhrzeitStart = '';
   let uhrzeitEnde = '';
@@ -70,32 +71,8 @@ export function parseSkedList (html: string): ParsedLecture[] {
          */
         return
     }
-
-    lastDatum = datum;
-
-    let start = null;
-    let end = null;
-    for (const format of ['DD.MM.YYYY H:m', 'LLL YYYY H:m']) {
-      start = moment.tz(datum + ' ' + uhrzeitStart, format, 'Europe/Berlin');
-      end = moment.tz(datum + ' ' + uhrzeitEnde, format, 'Europe/Berlin');
-      if (start.isValid() && end.isValid()) {
-        break;
-      }
-    }
-
-    if (!start.isValid() || !end.isValid()) {
-      return;
-    }
-
-    events.push({
-      info: anmerkung,
-      room: raum,
-      lecturer: dozent,
-      title: veranstaltung.replace(/^I-/, ''),
-      start: start.toDate(),
-      end: end.toDate(),
-      duration: end.diff(start, 'hours', true)
-    } as ParsedLecture);
+    const event = createEvent(datum, uhrzeitStart, uhrzeitEnde, veranstaltung, dozent, raum, anmerkung);
+    if (event) events.push(event);
   });
 
   return events;
@@ -134,7 +111,7 @@ export function parseSkedCSV (csvString: string): ParsedLecture[] {
         }
         case 'veranstaltung':
           // remove I- prefix from name if exists
-          veranstaltung = content.replace(/^I-/, '');
+          veranstaltung = content;
           break;
         case 'dozent':
           dozent = content;
@@ -149,34 +126,8 @@ export function parseSkedCSV (csvString: string): ParsedLecture[] {
           break;
       }
     });
-
-    let start = null;
-    let end = null;
-    for (const format of ['DD.MM.YYYY H:m', 'LLL YYYY H:m']) {
-      start = moment.tz(datum + ' ' + uhrzeitStart, format, 'Europe/Berlin');
-      end = moment.tz(datum + ' ' + uhrzeitEnde, format, 'Europe/Berlin');
-      if (start.isValid() && end.isValid()) {
-        break;
-      }
-    }
-    if (!start.isValid() || !end.isValid()) {
-      return;
-    }
-    if (veranstaltung === 'Information') {
-      // Ganztägige Informationsevents Fakultät I entfernen, da die im Kalender sehr schlecht aussehen
-      // todo ws21 diesen if-block entfernen, das ist nur ein workaround für ss21
-      return;
-    }
-
-    events.push({
-      info: anmerkung,
-      room: raum,
-      lecturer: dozent,
-      title: veranstaltung,
-      start: start.toDate(),
-      end: end.toDate(),
-      duration: end.diff(start, 'hours', true)
-    } as ParsedLecture);
+    const event = createEvent(datum, uhrzeitStart, uhrzeitEnde, veranstaltung, dozent, raum, anmerkung);
+    if (event) events.push(event);
   });
 
   return events;
@@ -276,26 +227,55 @@ export function parseSkedGraphical (html: string, faculty: string): ParsedLectur
             throw new Error('This faculty is not supported.');
         }
 
-        const dateFormat = 'DD.MM.YYYY H:m'
-        const start = moment.tz(datum + ' ' + uhrzeitStart, dateFormat, 'Europe/Berlin');
-        const end = moment.tz(datum + ' ' + uhrzeitEnde, dateFormat, 'Europe/Berlin');
-
-        if (!start.isValid() || !end.isValid()) {
-          return;
-        }
-
-        events.push({
-          info: anmerkung || '',
-          room: raum || '',
-          lecturer: dozent || '',
-          title: veranstaltung || '',
-          start: start.toDate(),
-          end: end.toDate(),
-          duration: end.diff(start, 'hours', true)
-        } as ParsedLecture);
+        const event = createEvent(datum, uhrzeitStart, uhrzeitEnde, veranstaltung, dozent, raum, anmerkung);
+        if (event) events.push(event);
       })
     })
   });
 
   return events;
+}
+
+function createEvent (datum: string, uhrzeitStart: string, uhrzeitEnde: string, veranstaltung: string, dozent: string, raum: string, anmerkung: string): ParsedLecture {
+  let start = null;
+  let end = null;
+  for (const format of ['DD.MM.YYYY H:m', 'LLL YYYY H:m']) {
+    start = moment.tz(datum + ' ' + uhrzeitStart, format, 'Europe/Berlin');
+    end = moment.tz(datum + ' ' + uhrzeitEnde, format, 'Europe/Berlin');
+    if (start.isValid() && end.isValid()) {
+      break;
+    }
+  }
+  if (!start.isValid() || !end.isValid()) {
+    return;
+  }
+
+  if (raum) {
+    // Allow only specific HTML attributes for the room since we directly render the HTML in the client
+    // Not doing this could lead to XSS possibilities, or some weird rendering if classes or styles are present in the tag
+    raum = sanitize(raum, {
+      allowedTags: ['a'],
+      allowedAttributes: {
+        a: ['href', 'target']
+      }
+    })
+  }
+  // Strip all html from dozent
+  dozent = sanitize(dozent, {})
+
+  if (veranstaltung === 'I-Information') {
+    // Ganztägige Informationsevents Fakultät I entfernen, da die im Kalender sehr schlecht aussehen
+    // todo ws21 diesen if-block entfernen, das ist nur ein workaround für ss21
+    return;
+  }
+
+  return {
+    info: anmerkung,
+    room: raum,
+    lecturer: dozent,
+    title: veranstaltung.replace(/^I-/, ''),
+    start: start.toDate(),
+    end: end.toDate(),
+    duration: end.diff(start, 'hours', true)
+  } as ParsedLecture;
 }
