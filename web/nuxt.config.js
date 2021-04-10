@@ -68,12 +68,7 @@ export default {
     // https://github.com/nuxt-community/dayjs-module
     '@nuxtjs/dayjs'
   ],
-  /*
-  ** Axios module configuration
-  */
-  axios: {
 
-  },
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 

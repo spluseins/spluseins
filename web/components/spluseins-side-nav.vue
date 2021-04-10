@@ -16,11 +16,11 @@
     <favorite-timetables-list v-if="hasFavoriteTimetables" />
     <v-divider />
     <general-timetables-list />
-    <no-ssr>
+    <client-only>
       <install-button-list
         class="stick-bottom"
       />
-    </no-ssr>
+    </client-only>
   </v-navigation-drawer>
 </template>
 

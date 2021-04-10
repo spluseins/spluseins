@@ -116,7 +116,6 @@ export default {
       mensaPlans: (state) => state.mensa.plans
     }),
     ...mapGetters({
-      customSchedulesAsRoutes: 'splus/customSchedulesAsRoutes',
       hasSubscribableTimetables: 'splus/hasSubscribableTimetables'
     })
   },

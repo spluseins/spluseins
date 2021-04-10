@@ -33,7 +33,7 @@
       </div>
     </div>
     <v-divider class="my-1" />
-    <no-ssr>
+    <client-only>
       <v-carousel
         v-if="hasAvailabePlans"
         :show-arrows="!$vuetify.breakpoint.mobile"
@@ -91,7 +91,7 @@
       >
         Aktuell sind keine Pläne verfügbar.
       </v-alert>
-    </no-ssr>
+    </client-only>
 
     <span class="pt-1 d-flex justify-end text-caption text--secondary">
       Quelle: openmensa.org
