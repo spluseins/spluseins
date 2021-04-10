@@ -36,8 +36,8 @@ export default {
     })
   },
   mounted () {
-    // Import custom schedule manually on client-side. Workaround for https://github.com/championswimmer/vuex-persist/issues/119
-    this.importSchedule({ params: this.$route.params, query: this.$route.query, importCustomSchedule: true });
+    // Import custom schedule manually on client-side after vuex-persist is ready. Workaround for https://github.com/championswimmer/vuex-persist/issues/119
+    setTimeout(() => { this.importSchedule({ params: this.$route.params, query: this.$route.query, importCustomSchedule: true }); }, 10);
   },
   async fetch ({ store, params, query, error }) {
     // import the schedule, but don't store custom schedules yet, because we can be on the server side here
