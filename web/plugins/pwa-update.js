@@ -9,7 +9,7 @@ export default async (context) => {
   workbox.addEventListener('installed', (event) => {
     if (!event.isUpdate) return
 
-    console.debug('There is an update for the PWA, reloading...')
+    console.debug('Update for the PWA available, reloading the page...')
     window.location.reload()
   })
 }

@@ -78,15 +78,12 @@ export default {
     },
     ...mapState({
       facultyNews: (state) => state.news.facultyNews,
-      faculty: (state) => state.news.faculty,
-      lazyLoad: (state) => state.lazyLoad
+      faculty: (state) => state.news.faculty
     })
   },
   mounted () {
-    if (this.lazyLoad) {
-      // static build -> no news are in the store
-      this.loadNews();
-    }
+    // force load because server side might use wrong selected faculty for loading
+    this.loadNews();
   },
   methods: {
     ...mapActions({

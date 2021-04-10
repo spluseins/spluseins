@@ -125,8 +125,7 @@ export default {
   },
   computed: {
     ...mapState({
-      plans: (state) => state.mensa.plans,
-      lazyLoad: (state) => state.lazyLoad
+      plans: (state) => state.mensa.plans
     }),
     groupedDayPlans () {
       const grouped = [];

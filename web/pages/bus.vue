@@ -19,7 +19,7 @@
 
           <v-list dense>
             <v-list-item
-              v-for="departure in departures[direction]"
+              v-for="departure in removePastDepartures(departures[direction])"
               :key="departure.date"
             >
               <v-list-item-content
@@ -81,8 +81,7 @@ export default {
   },
   computed: {
     ...mapState({
-      departures: (state) => state.bus.departures,
-      lazyLoad: (state) => state.lazyLoad
+      departures: (state) => state.bus.departures
     })
   },
   mounted () {
@@ -98,7 +97,11 @@ export default {
     }),
     ...mapMutations({
       setSidenav: 'ui/setSidenav'
-    })
+    }),
+    removePastDepartures (departures) {
+    // remove all departures older than 10 minutes ago
+      return departures.filter(dep => (this.minutesUntilDate(dep.date) > -10));
+    }
   },
   middleware: 'cached'
 };
