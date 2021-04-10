@@ -322,7 +322,7 @@ export const actions = {
   /**
    * Import timetable from route and set as current timetable.
    */
-  importSchedule ({ state, commit }, { params, query }) {
+  importSchedule ({ state, commit }, { params, query, importCustomSchedule }) {
     switch (parseFloat(query.v)) {
       case 1: {
         const whitelist = Array.isArray(query.course || [])
@@ -333,8 +333,7 @@ export const actions = {
           : [query.id];
         const label = query.name;
         const customTimetable = { id, label, whitelist };
-
-        commit('addCustomSchedule', customTimetable);
+        if (importCustomSchedule) commit('addCustomSchedule', customTimetable);
         commit('setSchedule', customTimetable);
         break;
       }

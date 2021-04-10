@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import SpluseinsCalendar from '../../components/spluseins-calendar.vue';
 
 export default {
@@ -30,11 +30,21 @@ export default {
       schedule: (state) => state.splus.schedule
     })
   },
+  methods: {
+    ...mapActions({
+      importSchedule: 'splus/importSchedule'
+    })
+  },
+  mounted () {
+    // Import custom schedule manually on client-side. Workaround for https://github.com/championswimmer/vuex-persist/issues/119
+    this.importSchedule({ params: this.$route.params, query: this.$route.query, importCustomSchedule: true });
+  },
   async fetch ({ store, params, query, error }) {
-    store.dispatch('splus/importSchedule', { params, query });
+    // import the schedule, but don't store custom schedules yet, because we can be on the server side here
+    store.dispatch('splus/importSchedule', { params, query, importCustomSchedule: false });
     store.commit('splus/resetWeek', process.static);
 
-    if (store.state.splus.schedule == undefined) {
+    if (store.state.splus.schedule === undefined) {
       error({ statusCode: 404, message: 'Plan existiert nicht' });
       return;
     }
