@@ -45,8 +45,7 @@ export const actions = {
     }
 
     await Promise.all([
-      dispatch('news/loadCampusNews'),
-      dispatch('news/loadFacultyNews')
+      dispatch('news/loadCampusNews')
     ]);
   }
 }

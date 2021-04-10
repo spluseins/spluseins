@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapMutations } from 'vuex';
 import { mdiNewspaper } from '@mdi/js'
 
 export default {
@@ -81,13 +81,20 @@ export default {
       faculty: (state) => state.news.faculty
     })
   },
+  watch: {
+    faculty: function () {
+      this.loadNews();
+    }
+  },
   mounted () {
     // force load because server side might use wrong selected faculty for loading
     this.loadNews();
   },
   methods: {
     ...mapActions({
-      loadNews: 'news/loadFacultyNews',
+      loadNews: 'news/loadFacultyNews'
+    }),
+    ...mapMutations({
       setFaculty: 'news/setFaculty'
     })
   }

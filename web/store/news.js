@@ -26,10 +26,6 @@ export const actions = {
       console.error('error during News API call (Fakultät-News)', error.message);
     }
   },
-  async setFaculty ({ commit, dispatch }, faculty) {
-    commit('setFaculty', faculty);
-    dispatch('loadFacultyNews');
-  },
   async loadCampusNews ({ commit }) {
     const campusSelectors = ['campus', 'campus38'];
     try {
